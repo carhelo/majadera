@@ -1,0 +1,311 @@
+<!DOCTYPE html> 
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Detector de Malas Palabras</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+      background-color: #f0f0f0; 
+      color: #333; 
+      position: relative;
+    }
+    h1, h2 {
+      color: #444; 
+    }
+    #background-image {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #f0f0f0; 
+      opacity: 0.1;
+      z-index: -1;
+    }
+    #startBtn, #stopBtn {
+      padding: 12px 24px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+      color: #fff; 
+      border: 2px solid #ccc; 
+      border-radius: 20px;
+      background-color: #8db409; 
+      transition: all 0.3s ease-in-out;
+    }
+    #startBtn:hover, #stopBtn:hover {
+      background-color: #7aa60e; 
+    }
+    #microphone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 20px;
+    }
+    #circle {
+      width: 30px;
+      height: 30px;
+      background-color: red; 
+      border-radius: 50%;
+      transition: background-color 0.3s;
+      box-shadow: 0px 0px 10px rgba(255, 0, 0, 0.7);
+    }
+    #circle.active {
+      background-color: #28a745; 
+      box-shadow: 0px 0px 15px rgba(40, 167, 69, 1);
+    }
+    #liveText {
+      font-size: 18px;
+      background-color: #fff; 
+      padding: 10px;
+      margin: 20px;
+      border-radius: 10px;
+      display: inline-block;
+      border: 2px solid #ccc; 
+      box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    }
+    table {
+      width: 80%;
+      margin: 20px auto;
+      border-collapse: separate; 
+      border-spacing: 0;
+      background-color: #fff; 
+      border-radius: 20px;
+      overflow: hidden;
+      border: 2px solid #ccc; 
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #8db409; 
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: rgba(141, 180, 9, 0.1); 
+    }
+    tr:nth-child(odd) {
+      background-color: rgba(141, 180, 9, 0.2); 
+    }
+
+    .top-images {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 20px 10%; /* Cambié el margen para centrar horizontalmente */
+  padding: 0 20px; /* Mantengo el padding para el espacio interno */
+}
+.top-images img {
+  max-height: 100px;
+  cursor: pointer;
+}
+.center-image {
+  cursor: default;
+}
+#pizzaCounter {
+  margin-top: 10px;
+  font-size: 16px;
+}
+#popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white; 
+  border: 2px solid #28a745; 
+  padding: 20px;
+  z-index: 9999;
+  display: none;
+  text-align: center;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+}
+#popup img {
+  max-height: 200px;
+  display: block;
+  margin: 0 auto 10px;
+}
+#popup p {
+  font-size: 20px;
+  color: #333; 
+}
+  </style>
+</head>
+<body>
+  <div id="background-image"></div>
+  <h1>Detector de Malas Palabras</h1>
+
+  <div class="top-images">
+    <div>
+      <img src="albaavion8bits.png" alt="Izquierda" onclick="window.open('turbulencia.html', '_blank')">
+      <div id="nombrejuego">GTA Turbulencia</div>
+    </div>
+    <div>
+      <img src="conejoenmoto.png" alt="Derecha">
+      <div id="pizzaCounter">Pizzas entregadas: <span id="pizzaCount">0</span></div>
+    </div>
+  </div>
+
+  <button id="startBtn">Iniciar Detección</button>
+  <button id="stopBtn">Pausar Detección</button>
+  <div id="microphone"><div id="circle"></div></div>
+  <div id="liveText"></div>
+  <h2>Malas Palabras Detectadas</h2>
+  <p>Total: <span id="badWordCount">0</span></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Día y Fecha</th>
+        <th>Hora</th>
+        <th>Palabra</th>
+        <th>Contexto</th>
+        <th>Tiempo Activo</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="detectedWords"></tbody>
+  </table>
+
+  <div id="popup">
+    <img id="popupImg" src="conejoenmoto.gif" alt="Conejo en Moto">
+    <p id="popupText">Felicidades Chat, Ganaron una PIZZA</p>
+  </div>
+
+  <audio id="pizzaSound" src="musica100badwords.mp3"></audio>
+  <audio id="explosionSound" src="explosionsound.mp3"></audio>
+
+  <script>
+    const socket = io();
+    let recognition;
+    let isListening = false;
+    let startTime = null;
+    let liveWords = [];
+    let pizzaCount = 0;
+    let previousBadWordCount = 0;
+
+    document.getElementById("startBtn").addEventListener("click", () => {
+      if (!isListening) {
+        startRecognition();
+        isListening = true;
+        startTime = new Date();
+        socket.emit("startDetection");
+        document.getElementById("circle").style.backgroundColor = "#28a745"; 
+      }
+    });
+
+    document.getElementById("stopBtn").addEventListener("click", () => {
+      if (isListening) {
+        stopRecognition();
+        isListening = false;
+        document.getElementById("circle").style.backgroundColor = "red"; 
+      }
+    });
+
+    function startRecognition() {
+      recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = "es-ES";
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onresult = (event) => {
+        let newText = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          newText += event.results[i][0].transcript + " ";
+        }
+
+        let newWords = newText.trim().split(/\s+/);
+        newWords = newWords.filter((word, i) => i === 0 || word.toLowerCase() !== newWords[i - 1].toLowerCase());
+        liveWords = [...liveWords, ...newWords];
+        if (liveWords.length > 5) liveWords = liveWords.slice(-5);
+
+        document.getElementById("liveText").innerText = liveWords.join(" ");
+        socket.emit("newText", newText);
+      };
+
+      recognition.onstart = () => document.getElementById("circle").classList.add("active");
+      recognition.onend = () => {
+        document.getElementById("circle").classList.remove("active");
+        if (isListening) startRecognition();
+      };
+
+      recognition.start();
+    }
+
+    function stopRecognition() {
+      if (recognition) recognition.stop();
+    }
+
+    socket.on("updateWords", (words) => {
+      const count = words.length;
+      document.getElementById("badWordCount").innerText = count;
+
+      const tableBody = document.getElementById("detectedWords");
+      tableBody.innerHTML = "";
+      words.forEach((entry, index) => {
+        const row = document.createElement("tr");
+        const date = new Date(); // Suponiendo que quieres la fecha actual
+        const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        row.innerHTML = `
+          <td>${formattedDate}</td>
+          <td>${entry.timestamp}</td>
+          <td>${entry.word}</td>
+          <td>${entry.context}</td>
+          <td>${entry.elapsedTime}</td>
+          <td><button class="deleteBtn" style="background-color: red; color: white; border-radius: 5px;">X</button></td>
+        `;
+
+        row.querySelector(".deleteBtn").addEventListener("click", () => {
+          socket.emit("deleteWord", index); // Envía el índice para eliminar
+        });
+
+        tableBody.appendChild(row);
+      });
+
+      if (count > 0 && count % 100 === 0 && count !== previousBadWordCount) {
+        previousBadWordCount = count;
+        pizzaCount++;
+        document.getElementById("pizzaCount").innerText = pizzaCount;
+
+        const popup = document.getElementById("popup");
+        const popupImg = document.getElementById("popupImg");
+        const popupText = document.getElementById("popupText");
+        const pizzaSound = document.getElementById("pizzaSound");
+        const explosionSound = document.getElementById("explosionSound");
+
+        popupImg.src = "conejoenmoto.gif";
+        popupText.innerText = "Felicidades Chat, Ganaron una PIZZA";
+        popup.style.display = "block";
+        pizzaSound.currentTime = 0;
+        pizzaSound.play();
+
+        popupImg.onclick = () => {
+          pizzaSound.pause();
+          popupImg.src = "explosion.gif";
+          popupText.innerText = "";
+          explosionSound.currentTime = 0;
+          explosionSound.play();
+
+          setTimeout(() => {
+            popup.style.display = "none";
+          }, 1000);
+        };
+      }
+    });
+
+    socket.on("resetTimer", () => {
+      startTime = new Date();
+    });
+
+    socket.on("clearLiveText", () => {
+      liveWords = [];
+      document.getElementById("liveText").innerText = "";
+    });
+  </script>
+</body>
+</html>

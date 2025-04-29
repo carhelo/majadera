@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flappy Bird</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('img/flappybirdfondo.jpg') no-repeat center center fixed;
+            background-size: cover;
+            height: 100vh; 
+        }
+        canvas {
+            display: block;
+            width: 100%; 
+            height: 100%; 
+        }
+        #scoreboard {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 32px; 
+            color: #000;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 24px; 
+        }
+        .modal button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: white;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px; 
+        }
+        #startButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            font-size: 24px;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas"></canvas>
+    <div id="scoreboard">
+        <div>Puntaje: <span id="score">0</span></div>
+        <div>Puntaje Anterior: <span id="finalScore">0</span></div>
+        <div>Récord: <span id="highScore">0</span></div>
+    </div>
+
+    <div class="modal" id="gameOverModal">
+        <div>GG papá!!!</div>
+        <button id="restartButton">Jugar de nuevo</button>
+    </div>
+
+    <button id="startButton">Comenzar</button>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+    
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    
+        const birdImg = new Image();
+        birdImg.src = 'img/figuraalbaavion.png';
+        const pipeBottomImg = new Image();
+        pipeBottomImg.src = 'img/tuberiaabajo.png';
+        const pipeTopImg = new Image();
+        pipeTopImg.src = 'img/tuberiaarriba.png';
+    
+        function lerp(a, b, t) {
+            return a + (b - a) * t;
+        }
+    
+        class Bird {
+            constructor() {
+                this.x = canvas.width / 2.5;
+                this.y = canvas.height / 2;
+                this.width = 70;
+                this.height = 60;
+                this.gravity = 0.25;
+                this.lift = -6.5;
+                this.velocity = 0;
+                this.rotation = 0;
+                this.targetRotation = 0;
+            }
+    
+            draw() {
+                ctx.save();
+                ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+                ctx.rotate((this.rotation * Math.PI) / 180);
+                ctx.drawImage(birdImg, -this.width / 2, -this.height / 2, this.width, this.height);
+                ctx.restore();
+            }
+    
+            update() {
+                this.velocity += this.gravity;
+                this.y += this.velocity;
+    
+                this.targetRotation = this.velocity < 0 ? -20 : 20;
+                this.rotation = lerp(this.rotation, this.targetRotation, 0.1); 
+    
+                if (this.y + this.height > canvas.height) {
+                    gameOver();
+                } else if (this.y < 0) {
+                    this.y = 0;
+                    this.velocity = 0;
+                }
+            }
+    
+            up() {
+                this.velocity += this.lift;
+            }
+        }
+    
+        class Pipe {
+            constructor() {
+                this.width = 80;
+                this.gap = 220;
+                this.top = Math.random() * (canvas.height / 2);
+                this.bottom = canvas.height - (this.top + this.gap);
+                this.x = canvas.width;
+                this.speed = 2.5;
+                this.scoreCounted = false;
+            }
+    
+            draw() {
+                ctx.drawImage(pipeTopImg, this.x, 0, this.width, this.top);
+                ctx.drawImage(pipeBottomImg, this.x, canvas.height - this.bottom, this.width, this.bottom);
+            }
+    
+            update() {
+                this.x -= this.speed;
+            }
+    
+            isOffScreen() {
+                return this.x + this.width < 0;
+            }
+        }
+    
+        let bird;
+        let pipes = [];
+        let frames = 0;
+        let score = 0;
+        let highScore = localStorage.getItem('highScore') || 0;
+        let gameActive = false;
+    
+        document.getElementById('startButton').addEventListener('click', initializeGame);
+        document.getElementById('restartButton').addEventListener('click', initializeGame);
+    
+        function initializeGame() {
+            bird = new Bird();
+            pipes = [];
+            frames = 0;
+            score = 0;
+            gameActive = true;
+            document.getElementById('gameOverModal').style.display = 'none';
+            document.getElementById('startButton').style.display = 'none';
+            draw();
+            document.getElementById('finalScore').textContent = localStorage.getItem('finalScore') || 0;
+            document.getElementById('highScore').textContent = highScore;
+        }
+    
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (gameActive) {
+                bird.update();
+                bird.draw();
+    
+                if (frames % 100 === 0) {
+                    pipes.push(new Pipe());
+                }
+    
+                pipes.forEach((pipe, index) => {
+                    pipe.update();
+                    pipe.draw();
+    
+                    if (!pipe.scoreCounted && pipe.x + pipe.width < bird.x) {
+                        score++;
+                        pipe.scoreCounted = true;
+                    }
+    
+                    if (
+                        bird.x + bird.width > pipe.x &&
+                        bird.x < pipe.x + pipe.width &&
+                        (bird.y < pipe.top || bird.y + bird.height > canvas.height - pipe.bottom)
+                    ) {
+                        gameOver();
+                    }
+    
+                    if (pipe.isOffScreen()) {
+                        pipes.splice(index, 1);
+                    }
+                });
+    
+                document.getElementById('score').textContent = score;
+                frames++;
+                requestAnimationFrame(draw);
+            }
+        }
+    
+        function gameOver() {
+            gameActive = false;
+            if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('highScore', highScore);
+            }
+            localStorage.setItem('finalScore', score);
+            document.getElementById('finalScore').textContent = score;
+            document.getElementById('highScore').textContent = highScore;
+            document.getElementById('gameOverModal').style.display = 'block';
+            verificarRecord();
+        }
+    
+        async function verificarRecord() {
+            const juego = 'flappybird';
+            const puntos = score;
+    
+            try {
+                const res = await fetch('/api/puntos');
+                const data = await res.json();
+    
+                const actual = data[juego] || { record: 0 };
+                if (puntos > actual.record) {
+                    await fetch('/api/puntos', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ juego, record: puntos })
+                    });
+                    console.log(`✈️ Nuevo récord de ${puntos} guardado para ${juego}`);
+                }
+            } catch (err) {
+                console.error('⚠️ Error al guardar récord en Flappy Bird:', err);
+            }
+        }
+    
+        document.addEventListener('keydown', function(event) {
+            if (gameActive && event.code === 'Space') {
+                bird.up();
+            }
+        });
+    
+        document.getElementById('startButton').style.display = 'block';
+    </script>
+    
+</body>
+</html>

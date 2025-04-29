@@ -1,0 +1,20 @@
+{
+  "badwords": [
+    "zorra", "chinga", "chingada", "chingar", "cabron", "cabrona", "pendejo", "pendeja", "idiota",
+    "culero", "culera", "verga", "pinche", "mierda", "puto", "puta", "coño", "mamón",
+    "mamona", "mongolico", "naco", "zorra", "chingón", "chingona", "madrazo", "pedorro",
+    "joto", "maricón", "marica", "ojete", "cabrón", "culero", "chingadera", "chingadazo",
+    "pichurriento", "pelón", "hocicón", "tarugo", "tarada",
+    "huevón", "huevona", "pinchi", "chingatumadre", "chinguen", "pito", "chupapitos",
+    "tragasables", "perra", "verga", "zopenco", "mugroso", "baboso", "pajero", "pajera","estupida","estupido",
+
+    "fuck", "shit", "bitch", "bastard", "asshole", "dick", "pussy", "motherfucker",
+    "cunt", "damn", "crap", "dumbass", "jackass", "cock", "faggot", "slut", "whore",
+    "son of a bitch", "douchebag", "prick", "wanker", "twat", "nigga", "bugger",
+    "bloody hell", "arsehole", "dickhead", "tosser", "shithead", "cocksucker",
+
+    "**", "***", "****", "*****", "******", "*******", "********", "*********",
+    "**********", "***********", "************", "*************", "**************",
+    "***************", "****************", "*****************", "******************"
+  ]
+}
