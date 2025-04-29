@@ -1,2 +1,17 @@
 node_modules
 .env
+# Node modules
+node_modules/
+
+# Variables de entorno
+.env
+
+# Archivos temporales de logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
