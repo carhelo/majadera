@@ -3,13 +3,17 @@ const http = require("http");
 const socketIo = require("socket.io");
 const fs = require("fs");
 const path = require("path");
+const { MongoClient } = require("mongodb");
 
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
+const PORT = process.env.PORT || 3000;
 
-const PORT = 3000;
-const DATA_FILE = "data.json";
+const MONGO_URI = "mongodb+srv://durangarciacarlosg1:23072311Bri@cluster0.tvkv5ec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const DB_NAME = "majadera";
+const COLLECTION_NAME = "detectedWords";
+
 const BADWORDS_FILE = "server/badwords.json";
 
 app.use(express.static("public"));
@@ -29,19 +33,8 @@ if (fs.existsSync(BADWORDS_FILE)) {
     }
 }
 
-let detectedWords = [];
-if (fs.existsSync(DATA_FILE)) {
-    try {
-        detectedWords = JSON.parse(fs.readFileSync(DATA_FILE, "utf8"));
-        if (!Array.isArray(detectedWords)) detectedWords = [];
-    } catch (error) {
-        console.error("⚠️ Error al leer data.json:", error);
-        detectedWords = [];
-    }
-}
-
 let startTime = null;
-const lastDetections = new Map(); 
+const lastDetections = new Map();
 
 function formatElapsedTime(ms) {
     const seconds = Math.floor(ms / 1000) % 60;
@@ -54,72 +47,78 @@ function isMaskedWord(word) {
     return /^\*{3,16}$/.test(word);
 }
 
-io.on("connection", (socket) => {
-    console.log("Usuario conectado");
-    socket.emit("updateWords", detectedWords);
+MongoClient.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(client => {
+        const db = client.db(DB_NAME);
+        const collection = db.collection(COLLECTION_NAME);
 
-    socket.on("startDetection", () => {
-        startTime = new Date();
-        socket.emit("resetTimer");
-    });
+        io.on("connection", async (socket) => {
+            console.log("Usuario conectado");
+            const initialWords = await collection.find({}).sort({ _id: -1 }).toArray();
+            socket.emit("updateWords", initialWords);
 
-    socket.on("newText", (text) => {
-        const rawWords = text.split(/\s+/);
-        let filteredWords = [];
-        let last = "";
-        rawWords.forEach(w => {
-            const clean = w.replace(/[.,!¡¿?;:]/g, "").toLowerCase();
-            if (clean && clean !== last) {
-                filteredWords.push(clean);
-                last = clean;
-            }
-        });
+            socket.on("startDetection", () => {
+                startTime = new Date();
+                socket.emit("resetTimer");
+            });
 
-        let detected = false;
+            socket.on("newText", async (text) => {
+                const rawWords = text.split(/\s+/);
+                let filteredWords = [];
+                let last = "";
+                rawWords.forEach(w => {
+                    const clean = w.replace(/[.,!¡¿?;:]/g, "").toLowerCase();
+                    if (clean && clean !== last) {
+                        filteredWords.push(clean);
+                        last = clean;
+                    }
+                });
 
-        filteredWords.forEach((word, index) => {
-            const cleanWord = word.replace(/\*/g, "");
-            const isBad = BAD_WORDS.includes(cleanWord) || isMaskedWord(word);
+                let detected = false;
 
-            if (isBad) {
-                const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
-                const timestamp = new Date().toLocaleTimeString();
-                const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
-                const entry = { timestamp, word, context, elapsedTime };
+                for (let index = 0; index < filteredWords.length; index++) {
+                    const word = filteredWords[index];
+                    const cleanWord = word.replace(/\*/g, "");
+                    const isBad = BAD_WORDS.includes(cleanWord) || isMaskedWord(word);
 
-                const key = word + "|" + context;
-                const now = Date.now();
-                const lastTime = lastDetections.get(key) || 0;
+                    if (isBad) {
+                        const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
+                        const timestamp = new Date().toLocaleTimeString();
+                        const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
+                        const entry = { timestamp, word, context, elapsedTime };
 
-                if (now - lastTime > 30000) { 
-                    detectedWords.unshift(entry);
-                    lastDetections.set(key, now);
-                    detected = true;
+                        const key = word + "|" + context;
+                        const now = Date.now();
+                        const lastTime = lastDetections.get(key) || 0;
+
+                        if (now - lastTime > 30000) {
+                            await collection.insertOne(entry);
+                            lastDetections.set(key, now);
+                            detected = true;
+                        }
+                    }
                 }
-            }
+
+                if (detected) {
+                    const updatedWords = await collection.find({}).sort({ _id: -1 }).toArray();
+                    io.emit("updateWords", updatedWords);
+                    io.emit("clearLiveText");
+                }
+            });
+
+            socket.on("deleteWord", async (index) => {
+                const allWords = await collection.find({}).sort({ _id: -1 }).toArray();
+                if (index >= 0 && index < allWords.length) {
+                    const toDelete = allWords[index];
+                    await collection.deleteOne({ _id: toDelete._id });
+                    const updatedWords = await collection.find({}).sort({ _id: -1 }).toArray();
+                    io.emit("updateWords", updatedWords);
+                }
+            });
         });
 
-        if (detected) {
-            try {
-                fs.writeFileSync(DATA_FILE, JSON.stringify(detectedWords, null, 2));
-                io.emit("updateWords", detectedWords);
-                io.emit("clearLiveText");
-            } catch (error) {
-                console.error("⚠️ Error al escribir en data.json:", error);
-            }
-        }
+        server.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
+    })
+    .catch(err => {
+        console.error("❌ Error al conectar con MongoDB:", err);
     });
-
-    // Nueva función para eliminar una palabra
-    socket.on("deleteWord", (index) => {
-        detectedWords.splice(index, 1); // Elimina la palabra de la lista
-        try {
-            fs.writeFileSync(DATA_FILE, JSON.stringify(detectedWords, null, 2)); // Actualiza el archivo
-            io.emit("updateWords", detectedWords); // Actualiza la tabla
-        } catch (error) {
-            console.error("⚠️ Error al escribir en data.json:", error);
-        }
-    });
-});
-
-server.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));

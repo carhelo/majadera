@@ -98,8 +98,8 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 20px 10%; /* Cambié el margen para centrar horizontalmente */
-  padding: 0 20px; /* Mantengo el padding para el espacio interno */
+  margin: 20px 10%; 
+  padding: 0 20px; 
 }
 .top-images img {
   max-height: 100px;
@@ -248,7 +248,7 @@
       tableBody.innerHTML = "";
       words.forEach((entry, index) => {
         const row = document.createElement("tr");
-        const date = new Date(); // Suponiendo que quieres la fecha actual
+        const date = new Date(); 
         const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
         row.innerHTML = `
@@ -261,7 +261,7 @@
         `;
 
         row.querySelector(".deleteBtn").addEventListener("click", () => {
-          socket.emit("deleteWord", index); // Envía el índice para eliminar
+          socket.emit("deleteWord", index); 
         });
 
         tableBody.appendChild(row);
