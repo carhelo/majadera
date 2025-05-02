@@ -78,18 +78,11 @@ MongoClient.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true
 
                 let detected = false;
 
-<<<<<<< HEAD
             if (isBad) {
                 const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
                 const timestamp = new Date().toISOString(); 
                 const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
                 const entry = { timestamp, word, context, elapsedTime };
-=======
-                for (let index = 0; index < filteredWords.length; index++) {
-                    const word = filteredWords[index];
-                    const cleanWord = word.replace(/\*/g, "");
-                    const isBad = BAD_WORDS.includes(cleanWord) || isMaskedWord(word);
->>>>>>> e70a62edab9883eded48059e054f5eaa8865248c
 
                     if (isBad) {
                         const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
@@ -132,7 +125,6 @@ MongoClient.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true
     .catch(err => {
         console.error("❌ Error al conectar con MongoDB:", err);
     });
-<<<<<<< HEAD
 
     socket.on("deleteWord", (index) => {
         detectedWords.splice(index, 1); 
@@ -143,8 +135,5 @@ MongoClient.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true
             console.error("⚠️ Error al escribir en data.json:", error);
         }
     });
-});
 
 server.listen(PORT, () => console.log(`Servidor corriendo en http://localhost:${PORT}`));
-=======
->>>>>>> e70a62edab9883eded48059e054f5eaa8865248c
