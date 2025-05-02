@@ -1,3 +1,5 @@
+require("dotenv").config(); 
+
 const express = require("express");
 const http = require("http");
 const socketIo = require("socket.io");
@@ -10,7 +12,7 @@ const server = http.createServer(app);
 const io = socketIo(server);
 const PORT = process.env.PORT || 3000;
 
-const MONGO_URI = "mongodb+srv://durangarciacarlosg1:23072311Bri@cluster0.tvkv5ec.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const MONGO_URI = process.env.MONGO_URI;
 const DB_NAME = "majadera";
 const COLLECTION_NAME = "detectedWords";
 
