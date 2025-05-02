@@ -95,45 +95,45 @@
     }
 
     .top-images {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 10%; /* Cambié el margen para centrar horizontalmente */
-  padding: 0 20px; /* Mantengo el padding para el espacio interno */
-}
-.top-images img {
-  max-height: 100px;
-  cursor: pointer;
-}
-.center-image {
-  cursor: default;
-}
-#pizzaCounter {
-  margin-top: 10px;
-  font-size: 16px;
-}
-#popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white; 
-  border: 2px solid #28a745; 
-  padding: 20px;
-  z-index: 9999;
-  display: none;
-  text-align: center;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
-}
-#popup img {
-  max-height: 200px;
-  display: block;
-  margin: 0 auto 10px;
-}
-#popup p {
-  font-size: 20px;
-  color: #333; 
-}
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 20px 10%; 
+      padding: 0 20px; 
+    }
+    .top-images img {
+      max-height: 100px;
+      cursor: pointer;
+    }
+    .center-image {
+      cursor: default;
+    }
+    #pizzaCounter {
+      margin-top: 10px;
+      font-size: 16px;
+    }
+    #popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white; 
+      border: 2px solid #28a745; 
+      padding: 20px;
+      z-index: 9999;
+      display: none;
+      text-align: center;
+      box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
+    }
+    #popup img {
+      max-height: 200px;
+      display: block;
+      margin: 0 auto 10px;
+    }
+    #popup p {
+      font-size: 20px;
+      color: #333; 
+    }
   </style>
 </head>
 <body>
@@ -160,8 +160,7 @@
   <table>
     <thead>
       <tr>
-        <th>Día y Fecha</th>
-        <th>Hora</th>
+        <th>Fecha y Hora</th>
         <th>Palabra</th>
         <th>Contexto</th>
         <th>Tiempo Activo</th>
@@ -248,12 +247,12 @@
       tableBody.innerHTML = "";
       words.forEach((entry, index) => {
         const row = document.createElement("tr");
-        const date = new Date(); // Suponiendo que quieres la fecha actual
-        const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        const timestampDate = new Date(entry.timestamp);
+        const formattedDateTime = timestampDate.toLocaleString('es-ES');
 
         row.innerHTML = `
-          <td>${formattedDate}</td>
-          <td>${entry.timestamp}</td>
+          <td>${formattedDateTime}</td>
           <td>${entry.word}</td>
           <td>${entry.context}</td>
           <td>${entry.elapsedTime}</td>
@@ -261,7 +260,7 @@
         `;
 
         row.querySelector(".deleteBtn").addEventListener("click", () => {
-          socket.emit("deleteWord", index); // Envía el índice para eliminar
+          socket.emit("deleteWord", index); 
         });
 
         tableBody.appendChild(row);
@@ -309,3 +308,4 @@
   </script>
 </body>
 </html>
+

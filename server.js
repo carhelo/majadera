@@ -83,7 +83,7 @@ io.on("connection", (socket) => {
 
             if (isBad) {
                 const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
-                const timestamp = new Date().toLocaleTimeString();
+                const timestamp = new Date().toISOString(); 
                 const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
                 const entry = { timestamp, word, context, elapsedTime };
 
@@ -110,12 +110,11 @@ io.on("connection", (socket) => {
         }
     });
 
-    // Nueva función para eliminar una palabra
     socket.on("deleteWord", (index) => {
-        detectedWords.splice(index, 1); // Elimina la palabra de la lista
+        detectedWords.splice(index, 1); 
         try {
-            fs.writeFileSync(DATA_FILE, JSON.stringify(detectedWords, null, 2)); // Actualiza el archivo
-            io.emit("updateWords", detectedWords); // Actualiza la tabla
+            fs.writeFileSync(DATA_FILE, JSON.stringify(detectedWords, null, 2)); 
+            io.emit("updateWords", detectedWords); 
         } catch (error) {
             console.error("⚠️ Error al escribir en data.json:", error);
         }

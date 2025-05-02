@@ -1,9 +1,44 @@
 [
   {
-    "timestamp": "22:50:20",
-    "word": "******",
-    "context": "prueba de mala palabra ******",
-    "elapsedTime": "00:00:19",
-    "date": "Lunes 28/Abril/25"
+    "timestamp": "2025-05-02 20:21:41",
+    "word": "mierda",
+    "context": "y no llevarte ni una mierda",
+    "elapsedTime": "00:01:34"
+  },
+  {
+    "timestamp": "2025-05-02 20:21:35",
+    "word": "culero",
+    "context": "qué padre aunque que culero",
+    "elapsedTime": "00:01:28"
+  },
+  {
+    "timestamp": "2025-05-02 20:11:28",
+    "word": "chingón",
+    "context": "qué chingón",
+    "elapsedTime": "00:01:21"
+  },
+  {
+    "timestamp": "2025-05-02 20:11:22",
+    "word": "pinche",
+    "context": "vamos pinche",
+    "elapsedTime": "00:01:15"
+  },
+  {
+    "timestamp": "2025-05-02 20:10:59",
+    "word": "mamona",
+    "context": "sí verdad se me hizo mamona",
+    "elapsedTime": "00:00:52"
+  },
+  {
+    "timestamp": "2025-05-02 20:10:20",
+    "word": "mamon",
+    "context": "mamon",
+    "elapsedTime": "00:00:14"
+  },
+  {
+    "timestamp": "2025-04-29 19:12:02",
+    "word": "baboso",
+    "context": "no puedo decir baboso",
+    "elapsedTime": "00:01:55"
   }
 ]
