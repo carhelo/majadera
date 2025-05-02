@@ -95,7 +95,6 @@
     }
 
     .top-images {
-<<<<<<< HEAD
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -135,47 +134,6 @@
       font-size: 20px;
       color: #333; 
     }
-=======
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 10%; 
-  padding: 0 20px; 
-}
-.top-images img {
-  max-height: 100px;
-  cursor: pointer;
-}
-.center-image {
-  cursor: default;
-}
-#pizzaCounter {
-  margin-top: 10px;
-  font-size: 16px;
-}
-#popup {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white; 
-  border: 2px solid #28a745; 
-  padding: 20px;
-  z-index: 9999;
-  display: none;
-  text-align: center;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.5);
-}
-#popup img {
-  max-height: 200px;
-  display: block;
-  margin: 0 auto 10px;
-}
-#popup p {
-  font-size: 20px;
-  color: #333; 
-}
->>>>>>> e70a62edab9883eded48059e054f5eaa8865248c
   </style>
 </head>
 <body>
@@ -289,14 +247,9 @@
       tableBody.innerHTML = "";
       words.forEach((entry, index) => {
         const row = document.createElement("tr");
-<<<<<<< HEAD
 
         const timestampDate = new Date(entry.timestamp);
         const formattedDateTime = timestampDate.toLocaleString('es-ES');
-=======
-        const date = new Date(); 
-        const formattedDate = date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
->>>>>>> e70a62edab9883eded48059e054f5eaa8865248c
 
         row.innerHTML = `
           <td>${formattedDateTime}</td>
@@ -354,9 +307,5 @@
     });
   </script>
 </body>
-<<<<<<< HEAD
 </html>
 
-=======
-</html>
->>>>>>> e70a62edab9883eded48059e054f5eaa8865248c
