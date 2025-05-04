@@ -42,6 +42,7 @@ if (fs.existsSync(DATA_FILE)) {
 
 let startTime = null;
 const lastDetections = new Map(); 
+const DETECTION_DELAY = 10000; 
 
 function formatElapsedTime(ms) {
     const seconds = Math.floor(ms / 1000) % 60;
@@ -87,13 +88,12 @@ io.on("connection", (socket) => {
                 const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
                 const entry = { timestamp, word, context, elapsedTime };
 
-                const key = word + "|" + context;
                 const now = Date.now();
-                const lastTime = lastDetections.get(key) || 0;
+                const lastTime = lastDetections.get(cleanWord) || 0;
 
-                if (now - lastTime > 30000) { 
+                if (now - lastTime > DETECTION_DELAY) { 
                     detectedWords.unshift(entry);
-                    lastDetections.set(key, now);
+                    lastDetections.set(cleanWord, now); 
                     detected = true;
                 }
             }

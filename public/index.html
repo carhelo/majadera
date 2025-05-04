@@ -134,6 +134,26 @@
       font-size: 20px;
       color: #333; 
     }
+    .bad-words-container {
+    background-color: #8db409; 
+    padding: 10px 20px; 
+    border-radius: 8px; 
+    display: inline-block; 
+    margin: 20px 0; 
+}
+
+.bad-word-title {
+    color: white; 
+    text-shadow: 1px 1px 0px black;
+}
+
+.bad-word-count {
+    background-color: #e8f0ce; 
+    color: black; 
+    text-shadow: 1px 1px 0px whitesmoke; 
+    padding: 5px; 
+    border-radius: 4px; 
+}
   </style>
 </head>
 <body>
@@ -154,9 +174,11 @@
   <button id="startBtn">Iniciar Detección</button>
   <button id="stopBtn">Pausar Detección</button>
   <div id="microphone"><div id="circle"></div></div>
-  <div id="liveText"></div>
-  <h2>Malas Palabras Detectadas</h2>
-  <p>Total: <span id="badWordCount">0</span></p>
+  <div id="liveText"></div> <br>
+  <div class="bad-words-container">
+    <h2 class="bad-word-title">Malas Palabras Detectadas</h2>
+    <h2 class="bad-word-count">Total: <span id="badWordCount">0</span></h2>
+</div>
   <table>
     <thead>
       <tr>
