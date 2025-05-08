@@ -1,5 +1,29 @@
 [
   {
+    "timestamp": "2025-05-07 20:38:58",
+    "word": "cabrona",
+    "context": "cabrona",
+    "elapsedTime": "00:42:12"
+  },
+  {
+    "timestamp": "2025-05-07 20:25:48",
+    "word": "pinche",
+    "context": "gente que yo tengo mi pinche",
+    "elapsedTime": "00:36:52"
+  },
+  {
+    "timestamp": "2025-05-07 20:25:15",
+    "word": "cabrón",
+    "context": "es que nos divirtamos todos cabrón",
+    "elapsedTime": "00:36:34"
+  },
+  {
+    "timestamp": "2025-05-07 20:24:51",
+    "word": "chingada",
+    "context": "me dona y a la chingada",
+    "elapsedTime": "00:35:55"
+  },
+  {
     "timestamp": "2025-05-07 20:17:08",
     "word": "pendeja",
     "context": "te vas a hacer puras pendeja",
