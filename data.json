@@ -1,4 +1,118 @@
-[
+[ 
+  {
+    "timestamp": "2025-05-13 21:00:43",
+    "word": "baboso",
+    "context": "del si se vuelve bien baboso",
+    "elapsedTime": "01:50:23"
+  },
+  {
+    "timestamp": "2025-05-13 20:54:17",
+    "word": "chingada",
+    "context": "lo que quieren a la chingada",
+    "elapsedTime": "01:44:06"
+  },
+  {
+    "timestamp": "2025-05-13 20:54:14",
+    "word": "verga",
+    "context": "que quieran y me vale verga",
+    "elapsedTime": "01:44:03"
+  },
+  {
+    "timestamp": "2025-05-13 20:53:46",
+    "word": "pendejo",
+    "context": "",
+    "elapsedTime": "01:42:56"
+  },
+  {
+    "timestamp": "2025-05-13 20:51:58",
+    "word": "chingada",
+    "context": "que chingada me importa",
+    "elapsedTime": "01:40:22"
+  },
+  {
+    "timestamp": "2025-05-13 20:47:10",
+    "word": "verga",
+    "context": "mental ahi esta pasando de verga wey no es cierto no",
+    "elapsedTime": "01:37:23"
+  },
+  {
+    "timestamp": "2025-05-13 20:46:33",
+    "word": "culero",
+    "context": "si sufres si esta bien culero",
+    "elapsedTime": "01:36:54"
+  },
+  {
+    "timestamp": "2025-05-13 20:18:29",
+    "word": "chingada",
+    "context": "por las autoridades y la chingada",
+    "elapsedTime": "01:06:11"
+  },
+  {
+    "timestamp": "2025-05-13 20:16:30",
+    "word": "pinche",
+    "context": "el audio otra vez tu pinche",
+    "elapsedTime": "01:04:48"
+  },
+  {
+    "timestamp": "2025-05-13 20:12:01",
+    "word": "cabrón",
+    "context": "ah cabrón",
+    "elapsedTime": "01:00:23"
+  },
+  {
+    "timestamp": "2025-05-13 19:47:02",
+    "word": "cabrón",
+    "context": "si esta cabrón",
+    "elapsedTime": "00:35:26"
+  },
+  {
+    "timestamp": "2025-05-13 19:30:19",
+    "word": "pendejo",
+    "context": "le estas hasciendo pendejo",
+    "elapsedTime": "00:18:43"
+  },
+  {
+    "timestamp": "2025-05-13 19::",
+    "word": "cabrón",
+    "context": "pues juguemos cabrón dije",
+    "elapsedTime": "00:18:29"
+  },
+  {
+    "timestamp": "2025-05-13 19:25:48",
+    "word": "mamón",
+    "context": "famosas malas entonces ponle un mamon",
+    "elapsedTime": "00:14:12"
+  },
+  {
+    "timestamp": "2025-05-13 19:25:48",
+    "word": "pinche",
+    "context": "ti no te dice no pinche",
+    "elapsedTime": "00:13:16"
+  },
+  {
+    "timestamp": "2025-05-13 19:19:14",
+    "word": "pendeja",
+    "context": "izquierdo puedo estudiar derecho que pendeja",
+    "elapsedTime": "00:07:38"
+  },
+  {
+    "timestamp": "2025-05-13 19:17:49",
+    "word": "pendeja",
+    "context": "ganas de que alguna carrera pendeja como psicología",
+    "elapsedTime": "00:06:13"
+  },
+  {
+    "timestamp": "2025-05-13 19:17:06",
+    "word": "pinche",
+    "context": "tik tok es que el pinche algoritmo nuevo esta bien cabrón",
+    "elapsedTime": "00:05:30"
+  },
+  {
+    "timestamp": "2025-05-13 19:16:12",
+    "word": "cabrón",
+    "context": "mi es mi tierra wey cabrón",
+    "elapsedTime": "00:04:36"
+  },
   {
     "timestamp": "2025-05-09 21:00:12",
     "word": "mamon",
@@ -30,7 +144,7 @@
     "elapsedTime": "00:22:42"
   },
   {
-    "timestamp": "2025-05-0 19:33:48",
+    "timestamp": "2025-05-09 19:33:48",
     "word": "estupida",
     "context": "locos que digas donde estas estupida",
     "elapsedTime": "00:07:36"
