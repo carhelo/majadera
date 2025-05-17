@@ -12,7 +12,7 @@ const io = socketIo(server);
 const PORT = 3000;
 const BADWORDS_FILE = "server/badwords.json";
 
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY_JSON);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   databaseURL: "https://badwords-detector-default-rtdb.firebaseio.com"
