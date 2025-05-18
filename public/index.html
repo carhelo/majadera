@@ -180,6 +180,7 @@
   <button id="stopBtn">Pausar Detección</button>
   <div id="microphone"><div id="circle"></div></div>
   <div id="liveText"></div> <br>
+  <div id="livePreview" style="color: gray; font-style: italic; margin-top: 5px;"></div>
   <div class="bad-words-container">
     <h2 class="bad-word-title">Malas Palabras Detectadas</h2>
     <h2 class="bad-word-count">Total: <span id="badWordCount">0</span></h2>
@@ -213,7 +214,7 @@
     let liveWords = [];
     let pizzaCount = 0;
     let previousBadWordCount = 0;
-    let lastTranscript = ""; // 👈 Nueva variable para evitar repeticiones
+    let lastTranscript = ""; 
   
     document.getElementById("startBtn").addEventListener("click", () => {
       if (!isListening) {
@@ -240,6 +241,8 @@
       recognition.interimResults = true;
   
       recognition.onresult = (event) => {
+        let interimTranscript = "";
+  
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
           if (result.isFinal) {
@@ -256,8 +259,11 @@
               document.getElementById("liveText").innerText = liveWords.join(" ");
               socket.emit("newText", finalTranscript);
             }
+          } else {
+            interimTranscript += result[0].transcript;
           }
         }
+        document.getElementById("livePreview").innerText = interimTranscript;
       };
   
       recognition.onstart = () => document.getElementById("circle").classList.add("active");
@@ -337,11 +343,11 @@
   
     socket.on("clearLiveText", () => {
       liveWords = [];
-      lastTranscript = ""; // 👈 También limpiamos esto al borrar liveText
+      lastTranscript = "";
       document.getElementById("liveText").innerText = "";
+      document.getElementById("livePreview").innerText = ""; 
     });
   </script>
-  
   
 </body>
 </html>
