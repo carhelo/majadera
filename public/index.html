@@ -213,71 +213,71 @@
     let liveWords = [];
     let pizzaCount = 0;
     let previousBadWordCount = 0;
-
+  
     document.getElementById("startBtn").addEventListener("click", () => {
       if (!isListening) {
         startRecognition();
         isListening = true;
         startTime = new Date();
         socket.emit("startDetection");
-        document.getElementById("circle").style.backgroundColor = "#28a745"; 
+        document.getElementById("circle").style.backgroundColor = "#28a745";
       }
     });
-
+  
     document.getElementById("stopBtn").addEventListener("click", () => {
       if (isListening) {
         stopRecognition();
         isListening = false;
-        document.getElementById("circle").style.backgroundColor = "red"; 
+        document.getElementById("circle").style.backgroundColor = "red";
       }
     });
-
+  
     function startRecognition() {
       recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
       recognition.lang = "es-ES";
       recognition.continuous = true;
       recognition.interimResults = true;
-
+  
       recognition.onresult = (event) => {
         let newText = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
           newText += event.results[i][0].transcript + " ";
         }
-
+  
         let newWords = newText.trim().split(/\s+/);
         newWords = newWords.filter((word, i) => i === 0 || word.toLowerCase() !== newWords[i - 1].toLowerCase());
         liveWords = [...liveWords, ...newWords];
         if (liveWords.length > 5) liveWords = liveWords.slice(-5);
-
+  
         document.getElementById("liveText").innerText = liveWords.join(" ");
         socket.emit("newText", newText);
       };
-
+  
       recognition.onstart = () => document.getElementById("circle").classList.add("active");
       recognition.onend = () => {
         document.getElementById("circle").classList.remove("active");
         if (isListening) startRecognition();
       };
-
+  
       recognition.start();
     }
-
+  
     function stopRecognition() {
       if (recognition) recognition.stop();
     }
-
+  
     socket.on("updateWords", (words) => {
       const count = words.length;
       document.getElementById("badWordCount").innerText = count;
-
+  
       const tableBody = document.getElementById("detectedWords");
       tableBody.innerHTML = "";
       words.forEach((entry, index) => {
         const row = document.createElement("tr");
-
+  
         const timestampDate = new Date(entry.timestamp);
         const formattedDateTime = timestampDate.toLocaleString('es-ES');
-
+  
         row.innerHTML = `
           <td>${formattedDateTime}</td>
           <td>${entry.word}</td>
@@ -285,54 +285,55 @@
           <td>${entry.elapsedTime}</td>
           <td><button class="deleteBtn" style="background-color: red; color: white; border-radius: 5px;">X</button></td>
         `;
-
+  
         row.querySelector(".deleteBtn").addEventListener("click", () => {
-          socket.emit("deleteWord", index); 
+          socket.emit("deleteWord", index);
         });
-
+  
         tableBody.appendChild(row);
       });
-
+  
       if (count > 0 && count % 100 === 0 && count !== previousBadWordCount) {
         previousBadWordCount = count;
         pizzaCount++;
         document.getElementById("pizzaCount").innerText = pizzaCount;
-
+  
         const popup = document.getElementById("popup");
         const popupImg = document.getElementById("popupImg");
         const popupText = document.getElementById("popupText");
         const pizzaSound = document.getElementById("pizzaSound");
         const explosionSound = document.getElementById("explosionSound");
-
+  
         popupImg.src = "conejoenmoto.gif";
         popupText.innerText = "Felicidades Chat, Ganaron una PIZZA";
         popup.style.display = "block";
         pizzaSound.currentTime = 0;
         pizzaSound.play();
-
+  
         popupImg.onclick = () => {
           pizzaSound.pause();
           popupImg.src = "explosion.gif";
           popupText.innerText = "";
           explosionSound.currentTime = 0;
           explosionSound.play();
-
+  
           setTimeout(() => {
             popup.style.display = "none";
           }, 1000);
         };
       }
     });
-
+  
     socket.on("resetTimer", () => {
       startTime = new Date();
     });
-
+  
     socket.on("clearLiveText", () => {
       liveWords = [];
       document.getElementById("liveText").innerText = "";
     });
   </script>
+  
 </body>
 </html>
 
