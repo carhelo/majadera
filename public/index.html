@@ -213,6 +213,7 @@
     let liveWords = [];
     let pizzaCount = 0;
     let previousBadWordCount = 0;
+    let lastTranscript = ""; // 👈 Nueva variable para evitar repeticiones
   
     document.getElementById("startBtn").addEventListener("click", () => {
       if (!isListening) {
@@ -239,18 +240,24 @@
       recognition.interimResults = true;
   
       recognition.onresult = (event) => {
-        let newText = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          newText += event.results[i][0].transcript + " ";
+          const result = event.results[i];
+          if (result.isFinal) {
+            const finalTranscript = result[0].transcript.trim();
+  
+            if (finalTranscript && finalTranscript !== lastTranscript) {
+              lastTranscript = finalTranscript;
+  
+              let newWords = finalTranscript.split(/\s+/);
+              newWords = newWords.filter((word, i) => i === 0 || word.toLowerCase() !== newWords[i - 1].toLowerCase());
+              liveWords = [...liveWords, ...newWords];
+              if (liveWords.length > 5) liveWords = liveWords.slice(-5);
+  
+              document.getElementById("liveText").innerText = liveWords.join(" ");
+              socket.emit("newText", finalTranscript);
+            }
+          }
         }
-  
-        let newWords = newText.trim().split(/\s+/);
-        newWords = newWords.filter((word, i) => i === 0 || word.toLowerCase() !== newWords[i - 1].toLowerCase());
-        liveWords = [...liveWords, ...newWords];
-        if (liveWords.length > 5) liveWords = liveWords.slice(-5);
-  
-        document.getElementById("liveText").innerText = liveWords.join(" ");
-        socket.emit("newText", newText);
       };
   
       recognition.onstart = () => document.getElementById("circle").classList.add("active");
@@ -330,9 +337,11 @@
   
     socket.on("clearLiveText", () => {
       liveWords = [];
+      lastTranscript = ""; // 👈 También limpiamos esto al borrar liveText
       document.getElementById("liveText").innerText = "";
     });
   </script>
+  
   
 </body>
 </html>
