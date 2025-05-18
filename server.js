@@ -41,8 +41,8 @@ if (fs.existsSync(BADWORDS_FILE)) {
 let detectedWords = [];
 let startTime = null;
 const lastDetections = new Map(); 
-const lastContexts = new Map();   
-const DETECTION_DELAY = 30000; 
+const lastContextDetections = new Map(); 
+const DETECTION_DELAY = 10000; // 10 segundos
 
 function formatElapsedTime(ms) {
   const seconds = Math.floor(ms / 1000) % 60;
@@ -84,6 +84,7 @@ wordsRef.once("value")
         });
 
         let detected = false;
+        const now = Date.now();
 
         filteredWords.forEach((word, index) => {
           const cleanWord = word.replace(/\*/g, "");
@@ -91,18 +92,16 @@ wordsRef.once("value")
 
           if (isBad) {
             const context = filteredWords.slice(Math.max(0, index - 5), index + 6).join(" ");
-            const timestamp = new Date().toISOString();
-            const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
-            const entry = { timestamp, word, context, elapsedTime };
+            const key = `${cleanWord}||${context}`;
+            const lastDetectionTime = lastContextDetections.get(key) || 0;
 
-            const now = Date.now();
-            const lastWordTime = lastDetections.get(cleanWord) || 0;
-            const lastContextTime = lastContexts.get(context) || 0;
+            if (now - lastDetectionTime > DETECTION_DELAY) {
+              const timestamp = new Date().toISOString();
+              const elapsedTime = startTime ? formatElapsedTime(new Date() - startTime) : "N/A";
+              const entry = { timestamp, word, context, elapsedTime };
 
-            if ((now - lastContextTime > DETECTION_DELAY)) {
               detectedWords.unshift(entry);
-              lastDetections.set(cleanWord, now);
-              lastContexts.set(context, now);
+              lastContextDetections.set(key, now);
               detected = true;
             }
           }
